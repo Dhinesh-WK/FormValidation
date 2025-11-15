@@ -8,26 +8,48 @@
 </head>
 <body>
 
+    <!-- Toast Notification -->
+    <div id="toast"></div>
+
     <div class="auth-box">
 
         <div class="tabs">
-            <button class="tab active" onclick="showForm('login')">Login</button>
-            <button class="tab" onclick="showForm('signup')">Signup</button>
+            <button class="tab active" id="loginTab" onclick="showForm('login')">Login</button>
+            <button class="tab" id="signupTab"  onclick="showForm('signup')">Signup</button>
         </div>
 
         <!-- LOGIN -->
-        <form id="login" class="form active" onsubmit="return loginValidate(event)">
+        <form id="login" class="form active" onsubmit="loginValidate(event)">
             <h2>Welcome Back 👋</h2>
 
             <input type="email" id="loginEmail" placeholder="Email Address">
             <input type="password" id="loginPassword" placeholder="Password">
+            <p id="forgotPass">Forgot password?</p>
 
             <p class="error" id="loginError"></p>
             <button class="btn">Login</button>
         </form>
 
+        <!-- OTP Verification -->
+        <form id="otpArea" class="form" onsubmit="validateOTP(event)">
+            <h2>Enter OTP 🧐</h2>
+            <input type="number" id="otp" placeholder="Enter OTP">
+            <p class="error" id="otpError"></p>
+            <button type="button" id="resendOTP" class="btn-resendOTP" style="margin-top:5px;">Resend OTP</button>
+            <button class="btn">Verify OTP</button>
+        </form>
+
+        <!-- Change Password -->
+        <form id="changePass" class="form" onsubmit="updatePassword(event)">
+            <h2>Set New Password🫣</h2>
+            <input type="password" id="pass" placeholder="New Password">
+            <input type="password" id="rePass" placeholder="Confirm Password">
+            <p class="error" id="setNewPass"></p>
+            <button class="btn">Submit</button>
+        </form>
+
         <!-- SIGNUP -->
-        <form id="signup" class="form" onsubmit="return signupValidate(event)">
+        <form id="signup" class="form" onsubmit="signupValidate(event)">
             <h2>Create Account ✨</h2>
 
             <input type="text" id="name" placeholder="Full Name">
