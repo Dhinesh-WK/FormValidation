@@ -1,22 +1,32 @@
 let userEmail = "";
 let generatedOTP = "";
 
-// --- Toast Notification ---
+// ---------------- EMAIL VALIDATION ----------------
+function isValidEmail(email) {
+    let pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return pattern.test(email);
+}
+
+// ---------------- STRONG PASSWORD VALIDATION ----------------
+function isStrongPassword(pass) {
+    let pattern = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/;
+    return pattern.test(pass);
+}
+
+// ---------------- TOAST NOTIFICATION ----------------
 function showToast(msg, type = "info", persistent = false) {
     let toast = document.getElementById("toast");
 
-    // Remove previous hide timer instantly
     clearTimeout(window.toastTimer);
 
     toast.textContent = msg;
 
     toast.style.background =
         type === "error" ? "#d9534f" :
-        type === "success" ? "#28a745" : "#222";
+            type === "success" ? "#28a745" : "#222";
 
     toast.classList.add("show");
 
-    // Auto hide only when NOT persistent
     if (!persistent) {
         window.toastTimer = setTimeout(() => {
             toast.classList.remove("show");
@@ -24,8 +34,7 @@ function showToast(msg, type = "info", persistent = false) {
     }
 }
 
-
-// TAB SWITCH
+// ---------------- TAB SWITCH ----------------
 function showForm(form) {
     document.querySelectorAll(".form").forEach(f => f.classList.remove("active"));
     document.getElementById(form).classList.add("active");
@@ -36,7 +45,7 @@ function showForm(form) {
         event.target.classList.add("active");
 }
 
-// ------------------------ LOGIN ------------------------
+// ---------------- LOGIN ----------------
 function loginValidate(event) {
     event.preventDefault();
 
@@ -46,6 +55,11 @@ function loginValidate(event) {
 
     if (!email || !pass) {
         loginError.innerText = "All fields required";
+        return;
+    }
+
+    if (!isValidEmail(email)) {
+        loginError.innerText = "Enter a valid email";
         return;
     }
 
@@ -79,7 +93,7 @@ function clearLoginInputs() {
     loginPassword.value = "";
 }
 
-// ------------------------ SIGNUP ------------------------
+// ---------------- SIGNUP ----------------
 function signupValidate(event) {
     event.preventDefault();
 
@@ -91,6 +105,16 @@ function signupValidate(event) {
 
     if (!name || !email || !number || !pass || !repass) {
         signupError.innerText = "All fields required";
+        return;
+    }
+
+    if (!isValidEmail(email)) {
+        signupError.innerText = "Enter a valid email";
+        return;
+    }
+
+    if (!isStrongPassword(pass)) {
+        signupError.innerText = "Password must contain 1 uppercase, 1 number, 1 special character & min 8 chars";
         return;
     }
 
@@ -141,29 +165,26 @@ function clearSignupInputs() {
     });
 }
 
-// ------------------------ FORGOT PASSWORD ------------------------
+// ---------------- FORGOT PASSWORD ----------------
 forgotPass.addEventListener("click", () => {
     showForm("otpArea");
 
     generatedOTP = generateOTP();
 
-    // Persistent toast
     showToast("OTP: " + generatedOTP, "success", true);
 
     document.getElementById("resendOTP").style.display = "block";
 });
 
-//-------------------------- OTP SECTION ---------------------------------
+// ---------------- OTP SECTION ----------------
 function generateOTP() {
     return Math.floor(1000 + Math.random() * 9000);
 }
 
 document.getElementById("resendOTP").addEventListener("click", () => {
     generatedOTP = generateOTP();
-
     showToast("New OTP: " + generatedOTP, "success", true);
 });
-
 
 function validateOTP(event) {
     event.preventDefault();
@@ -173,21 +194,19 @@ function validateOTP(event) {
     if (otp == generatedOTP) {
         showToast("OTP Verified ✔", "success");
 
-        // remove OTP toast after verifying
         setTimeout(() => {
             document.getElementById("toast").classList.remove("show");
         }, 800);
 
         showForm("changePass");
         otpError.innerText = "";
-    } 
+    }
     else {
         otpError.innerText = "Invalid OTP";
     }
 }
 
-
-// ------------------------ UPDATE PASSWORD ------------------------
+// ---------------- UPDATE PASSWORD ----------------
 function updatePassword(event) {
     event.preventDefault();
 
@@ -199,8 +218,8 @@ function updatePassword(event) {
         return;
     }
 
-    if (pass.length < 8) {
-        setNewPass.innerText = "Minimum 8 characters";
+    if (!isStrongPassword(pass)) {
+        setNewPass.innerText = "Weak password (need uppercase, number & special char)";
         return;
     }
 
@@ -223,30 +242,61 @@ function updatePassword(event) {
     showToast("Password Updated", "success");
     document.getElementById("pass").value = "";
     document.getElementById("rePass").value = "";
-    location.reload();
+    setTimeout(() => {
+        location.reload();
+    }, 1200);
+
 }
 
-// --------------------- TABS -------------------
-
-// LOGIN TAB CLICK
+// ---------------- TABS ----------------
 document.getElementById("loginTab").addEventListener("click", () => {
-    clearAllInputs();       
+    clearAllInputs();
 });
 
-// SIGNUP TAB CLICK
 document.getElementById("signupTab").addEventListener("click", () => {
-    clearAllInputs();            // clear everything
+    clearAllInputs();
 });
 
-
-// ------------------ CLEAR ALL INPUTS --------------------
+// ---------------- CLEAR ALL INPUTS ----------------
 function clearAllInputs() {
     document.querySelectorAll("input").forEach(inp => inp.value = "");
-    
-    // hide error texts
+
     document.querySelectorAll(".error").forEach(err => err.innerText = "");
     document.getElementById("forgotPass").style.display = "none";
 
-    // hide toast 
     document.getElementById("toast").classList.remove("show");
 }
+
+
+// ---------------- PASSWORD EYE TOGGLE ----------------
+
+// Generic toggle function (for all password fields)
+function toggleVisibility(inputId, iconElement) {
+    let input = document.getElementById(inputId);
+
+    if (input.type === "password") {
+        input.type = "text";
+        iconElement.classList.remove("fa-eye");
+        iconElement.classList.add("fa-eye-slash");
+    } else {
+        input.type = "password";
+        iconElement.classList.remove("fa-eye-slash");
+        iconElement.classList.add("fa-eye");
+    }
+}
+
+// SIGNUP + CHANGE PASSWORD Eye Toggle
+function togglePassword(icon) {
+    toggleVisibility("password", icon.querySelector("i"));
+}
+
+// LOGIN Eye Toggle
+function toggleLoginPassword(icon) {
+    toggleVisibility("loginPassword", icon.querySelector("i"));
+}
+
+// CHANGE PASSWORD (new password field)
+function toggleNewPass(icon) {
+    toggleVisibility("pass", icon.querySelector("i"));
+}
+
