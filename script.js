@@ -1,76 +1,88 @@
+let userEmail = "";
+let generatedOTP = "";
+
+// --- Toast Notification ---
+function showToast(msg, type = "info", persistent = false) {
+    let toast = document.getElementById("toast");
+
+    // Remove previous hide timer instantly
+    clearTimeout(window.toastTimer);
+
+    toast.textContent = msg;
+
+    toast.style.background =
+        type === "error" ? "#d9534f" :
+        type === "success" ? "#28a745" : "#222";
+
+    toast.classList.add("show");
+
+    // Auto hide only when NOT persistent
+    if (!persistent) {
+        window.toastTimer = setTimeout(() => {
+            toast.classList.remove("show");
+        }, 2500);
+    }
+}
+
+
+// TAB SWITCH
 function showForm(form) {
     document.querySelectorAll(".form").forEach(f => f.classList.remove("active"));
     document.getElementById(form).classList.add("active");
 
     document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-    event.target.classList.add("active");
+
+    if (event.target.classList.contains("tab"))
+        event.target.classList.add("active");
 }
 
+// ------------------------ LOGIN ------------------------
+function loginValidate(event) {
+    event.preventDefault();
 
-function clearSignupInputs() {
-    let fields = ["name", "email", "number", "password", "rePassword"];
+    let email = loginEmail.value;
+    let pass = loginPassword.value;
+    userEmail = email;
 
-    fields.forEach(id => {
-        document.getElementById(id).value = "";
-    });
+    if (!email || !pass) {
+        loginError.innerText = "All fields required";
+        return;
+    }
+
+    checkUserLogin(email, pass);
+}
+
+function checkUserLogin(email, pass) {
+    let users = JSON.parse(localStorage.getItem("Users")) || [];
+
+    let user = users.find(u => u.email === email);
+
+    if (!user) {
+        showToast("Email does not exist!", "error");
+        forgotPass.style.display = "none";
+        return;
+    }
+
+    if (user.password !== pass) {
+        showToast("Incorrect password", "error");
+        forgotPass.style.display = "block";
+        return;
+    }
+
+    showToast("Login Successful", "success");
+    forgotPass.style.display = "none";
+    clearLoginInputs();
 }
 
 function clearLoginInputs() {
-    document.getElementById("loginEmail").value = "";
-    document.getElementById("loginPassword").value = "";
+    loginEmail.value = "";
+    loginPassword.value = "";
 }
 
-// LOGIN VALIDATION
-function loginValidate(event) {
-    event.preventDefault(); 
-
-    let email = document.getElementById("loginEmail").value;
-    let pass = document.getElementById("loginPassword").value;
-
-    if (email === "" || pass === "") {
-        loginError.innerText = "All fields are required";
-        return false;
-    }
-    else 
-        checkUserLogin(email,pass)
-
-    loginError.innerText = "";
-    return true;
-}
-
-function checkUserLogin(email,pass){
-    let users = JSON.parse(localStorage.getItem("Users")) || [];
-
-    let emailMatch = false
-    let passMatch = false
-
-    users.forEach(user => {
-        if(user.email == email){
-            emailMatch = true
-        }
-        if(user.email == email && user.password == pass){
-            passMatch = true
-        }
-    })
-
-    if(emailMatch && !passMatch) {
-        alert("PassWord is incorrect")
-    }
-    else if(!emailMatch) {
-        alert("email is Not Exists Please do Signup")
-    }
-    else if(emailMatch && passMatch) {
-        alert("Login Successfully")
-        clearLoginInputs()
-    }
-}
-
-let isValidate = true;
-// SIGNUP VALIDATION
+// ------------------------ SIGNUP ------------------------
 function signupValidate(event) {
-    event.preventDefault(); 
+    event.preventDefault();
 
-    isValidate = true;
     let name = document.getElementById("name").value;
     let email = document.getElementById("email").value;
     let number = document.getElementById("number").value;
@@ -79,76 +91,162 @@ function signupValidate(event) {
 
     if (!name || !email || !number || !pass || !repass) {
         signupError.innerText = "All fields required";
-        isValidate = false;
-        return false;
+        return;
     }
 
     if (pass !== repass) {
         signupError.innerText = "Passwords do not match";
-        isValidate = false;
-        return false;
+        return;
     }
 
     if (number.length !== 10) {
-        signupError.innerText = "Enter 10-digit mobile number";
-        isValidate = false;
-        return false;
+        signupError.innerText = "Enter 10-digit number";
+        return;
     }
 
     signupError.innerText = "";
-
-    if(isValidate) {
-        checkUserSignUp(email,number,name,pass)
-    }
-
-    clearSignupInputs()
-    return true;
+    checkSignup(email, number, name, pass);
 }
 
-function checkUserSignUp(email, number, name, pass) {
-
-    console.log("Checked user");
-
-    let isPresent = false;
-
-    // Load old users From localStorage
+function checkSignup(email, number, name, pass) {
     let users = JSON.parse(localStorage.getItem("Users")) || [];
 
-    users.forEach(user => {
-        if (user.email === email || user.number === number) {
-            isPresent = true;
-        }
-    });
-
-    // If already exists
-    if (isPresent) {
-        alert("Email or Number already exists (Please Login) or Try new Email and Number");
+    if (users.some(u => u.email === email || u.number === number)) {
+        showToast("Email or Number already exists", "error");
+        return;
     }
 
-    // If new user
-    if (!isPresent) {
-        storeUser(name, email, number, pass);
-    }
+    storeUser(name, email, number, pass);
 }
 
-
 function storeUser(name, email, number, pass) {
-    console.log("Stored user")
-    let newUser = {
+    let users = JSON.parse(localStorage.getItem("Users")) || [];
+
+    users.push({
         name,
         email,
         number,
         password: pass
-    };
+    });
 
-    // Load old users or create empty array
-    let users = JSON.parse(localStorage.getItem("Users")) || [];
-
-    // Add new user
-    users.push(newUser);
-
-    // Save back to localStorage
     localStorage.setItem("Users", JSON.stringify(users));
 
-    alert("Signup Successful");
+    showToast("Signup Successful", "success");
+    clearSignupInputs();
+}
+
+function clearSignupInputs() {
+    ["name", "email", "number", "password", "rePassword"].forEach(id => {
+        document.getElementById(id).value = "";
+    });
+}
+
+// ------------------------ FORGOT PASSWORD ------------------------
+forgotPass.addEventListener("click", () => {
+    showForm("otpArea");
+
+    generatedOTP = generateOTP();
+
+    // Persistent toast
+    showToast("OTP: " + generatedOTP, "success", true);
+
+    document.getElementById("resendOTP").style.display = "block";
+});
+
+//-------------------------- OTP SECTION ---------------------------------
+function generateOTP() {
+    return Math.floor(1000 + Math.random() * 9000);
+}
+
+document.getElementById("resendOTP").addEventListener("click", () => {
+    generatedOTP = generateOTP();
+
+    showToast("New OTP: " + generatedOTP, "success", true);
+});
+
+
+function validateOTP(event) {
+    event.preventDefault();
+
+    let otp = document.getElementById("otp").value;
+
+    if (otp == generatedOTP) {
+        showToast("OTP Verified ✔", "success");
+
+        // remove OTP toast after verifying
+        setTimeout(() => {
+            document.getElementById("toast").classList.remove("show");
+        }, 800);
+
+        showForm("changePass");
+        otpError.innerText = "";
+    } 
+    else {
+        otpError.innerText = "Invalid OTP";
+    }
+}
+
+
+// ------------------------ UPDATE PASSWORD ------------------------
+function updatePassword(event) {
+    event.preventDefault();
+
+    let pass = document.getElementById("pass").value;
+    let repass = document.getElementById("rePass").value;
+
+    if (!pass || !repass) {
+        setNewPass.innerText = "Fill both fields";
+        return;
+    }
+
+    if (pass.length < 8) {
+        setNewPass.innerText = "Minimum 8 characters";
+        return;
+    }
+
+    if (pass !== repass) {
+        setNewPass.innerText = "Passwords do not match";
+        return;
+    }
+
+    let users = JSON.parse(localStorage.getItem("Users")) || [];
+
+    users = users.map(user => {
+        if (user.email === userEmail) {
+            user.password = pass;
+        }
+        return user;
+    });
+
+    localStorage.setItem("Users", JSON.stringify(users));
+
+    showToast("Password Updated", "success");
+    document.getElementById("pass").value = "";
+    document.getElementById("rePass").value = "";
+    location.reload();
+}
+
+// --------------------- TABS -------------------
+
+// LOGIN TAB CLICK
+document.getElementById("loginTab").addEventListener("click", () => {
+    clearAllInputs();       
+});
+
+// SIGNUP TAB CLICK
+document.getElementById("signupTab").addEventListener("click", () => {
+    clearAllInputs();            // clear everything
+});
+
+
+// ------------------ CLEAR ALL INPUTS --------------------
+function clearAllInputs() {
+    document.querySelectorAll("input").forEach(inp => inp.value = "");
+    
+    // hide error texts
+    document.querySelectorAll(".error").forEach(err => err.innerText = "");
+    document.getElementById("forgotPass").style.display = "none";
+
+    // hide toast 
+    document.getElementById("toast").classList.remove("show");
 }
