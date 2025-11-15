@@ -154,8 +154,9 @@ input::placeholder {
     body {
         justify-content: flex-start;
         align-items: flex-start;
-        overflow: hidden;
         margin: 0px;
+        overflow-y: hidden;
+        overflow-x: hidden;
     }
 
     .auth-box {
@@ -179,5 +180,6 @@ input::placeholder {
         margin-top: 20px;
     }
 }
+
 
 
