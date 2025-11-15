@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Auth UI</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="auth-box">
+
+        <div class="tabs">
+            <button class="tab active" onclick="showForm('login')">Login</button>
+            <button class="tab" onclick="showForm('signup')">Signup</button>
+        </div>
+
+        <!-- LOGIN -->
+        <form id="login" class="form active" onsubmit="return loginValidate(event)">
+            <h2>Welcome Back 👋</h2>
+
+            <input type="email" id="loginEmail" placeholder="Email Address">
+            <input type="password" id="loginPassword" placeholder="Password">
+
+            <p class="error" id="loginError"></p>
+            <button class="btn">Login</button>
+        </form>
+
+        <!-- SIGNUP -->
+        <form id="signup" class="form" onsubmit="return signupValidate(event)">
+            <h2>Create Account ✨</h2>
+
+            <input type="text" id="name" placeholder="Full Name">
+            <input type="email" id="email" placeholder="Email Address">
+            <input type="number" id="number" placeholder="Mobile Number">
+            <input type="password" id="password" placeholder="Password">
+            <input type="password" id="rePassword" placeholder="Confirm Password">
+
+            <p class="error" id="signupError"></p>
+            <button class="btn">Signup</button>
+        </form>
+
+    </div>
+
+<script src="script.js"></script>
+</body>
+</html>
