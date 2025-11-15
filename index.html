@@ -1,11 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Form - Dhinesh</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
     <!-- Toast Notification -->
@@ -15,7 +21,7 @@
 
         <div class="tabs">
             <button class="tab active" id="loginTab" onclick="showForm('login')">Login</button>
-            <button class="tab" id="signupTab"  onclick="showForm('signup')">Signup</button>
+            <button class="tab" id="signupTab" onclick="showForm('signup')">Signup</button>
         </div>
 
         <!-- LOGIN -->
@@ -23,7 +29,15 @@
             <h2>Welcome Back 👋</h2>
 
             <input type="email" id="loginEmail" placeholder="Email Address">
-            <input type="password" id="loginPassword" placeholder="Password">
+
+            <!-- Eye Toggle for Login Password -->
+            <div class="password-box">
+                <input type="password" id="loginPassword" placeholder="Password">
+                <span class="eye" onclick="toggleLoginPassword(this)">
+                    <i class="fa-solid fa-eye"></i>
+                </span>
+            </div>
+
             <p id="forgotPass">Forgot password?</p>
 
             <p class="error" id="loginError"></p>
@@ -41,21 +55,39 @@
 
         <!-- Change Password -->
         <form id="changePass" class="form" onsubmit="updatePassword(event)">
-            <h2>Set New Password🫣</h2>
-            <input type="password" id="pass" placeholder="New Password">
+            <h2>Set New Password 🫣</h2>
+
+            <!-- With Eye -->
+            <div class="password-box">
+                <input type="password" id="pass" placeholder="New Password">
+                <span class="eye" onclick="toggleNewPass(this)">
+                    <i class="fa-solid fa-eye"></i>
+                </span>
+            </div>
+
+            <!-- No eye for confirm password -->
             <input type="password" id="rePass" placeholder="Confirm Password">
+
             <p class="error" id="setNewPass"></p>
             <button class="btn">Submit</button>
         </form>
 
         <!-- SIGNUP -->
         <form id="signup" class="form" onsubmit="signupValidate(event)">
-            <h2>Create Account ✨</h2>
+            <h2>Create Account 👤</h2>
 
             <input type="text" id="name" placeholder="Full Name">
             <input type="email" id="email" placeholder="Email Address">
             <input type="number" id="number" placeholder="Mobile Number">
-            <input type="password" id="password" placeholder="Password">
+
+            <!-- Eye Toggle for Signup Password -->
+            <div class="password-box">
+                <input type="password" id="password" placeholder="Password">
+                <span class="eye" onclick="togglePassword(this)">
+                    <i class="fa-solid fa-eye"></i>
+                </span>
+            </div>
+
             <input type="password" id="rePassword" placeholder="Confirm Password">
 
             <p class="error" id="signupError"></p>
@@ -64,7 +96,7 @@
 
     </div>
 
-<script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
-</html>
 
+</html>
